@@ -164,16 +164,29 @@ function Login() {
                 error={errors.passwordError}
               />
             </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
+            <MDBox display="flex" alignItems="center" justifyContent="space-between" ml={-1}>
+              <MDBox>
+                <Switch checked={rememberMe} onChange={handleSetRememberMe} />
+                <MDTypography
+                  variant="button"
+                  fontWeight="regular"
+                  color="text"
+                  onClick={handleSetRememberMe}
+                  sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
+                >
+                  &nbsp;&nbsp;Remember me
+                </MDTypography>
+              </MDBox>
+
               <MDTypography
+                component={Link}
+                to="/auth/register"
                 variant="button"
-                fontWeight="regular"
-                color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
+                fontWeight="bold"
+                color="info"
+                sx={{ textDecoration: "none", mr: 1 }}
               >
-                &nbsp;&nbsp;Remember me
+                Go to the Register...
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>

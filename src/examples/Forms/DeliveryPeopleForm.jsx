@@ -56,7 +56,7 @@ function DeliveryPeopleForm({ onClose, initialPerson }) {
             const token = localStorage.getItem("token");
 
             const response = await axios.post(
-                `http://localhost:3003/api/v1/auth/deliverymanRegisterWithOwner`,
+                `${API_BASE_URL}api/v1/auth/deliverymanRegisterWithOwner`,
                 data,
                 {
                     headers: {

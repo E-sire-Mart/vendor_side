@@ -100,6 +100,17 @@ function Basic() {
               >
                 &nbsp;&nbsp;Remember me
               </MDTypography>
+
+              <MDTypography
+                component={Link}
+                to="/auth/register"
+                variant="button"
+                fontWeight="regular"
+                color="info"
+                sx={{ textDecoration: "none", mr: 1 }}
+              >
+                Register
+              </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth>

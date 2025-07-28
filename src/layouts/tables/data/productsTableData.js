@@ -4,12 +4,11 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { useEffect, useState } from "react";
 import ProductService from "services/product-service";
-
 export default function data(searchText) {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProduct1, setSelectedProduct1] = useState(null);
-  const API_URL = "http://localhost:3003/";
+  const API_URL = process.env.REACT_APP_SERVER_URL;
 
     // console.log("----dfdfdfdfd-------", API_URL)
 

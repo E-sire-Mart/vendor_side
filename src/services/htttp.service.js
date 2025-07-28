@@ -1,8 +1,8 @@
 import Axios from "axios";
-
-const API_URL = "http://localhost:3003/";
+// const API_URL = import.meta.env.VITE_SERVER_URL;
+const API_URL = process.env.REACT_APP_SERVER_URL;
+console.log(API_URL, "fk;fk;skf;lskf;")
 Axios.defaults.baseURL = API_URL;
-// console.log(process.env.VITE_SERVER_URL, "fk;fk;skf;lskf;")
 export class HttpService {
   _axios = Axios.create();
 
