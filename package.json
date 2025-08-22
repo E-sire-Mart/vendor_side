@@ -80,6 +80,6 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "prettier": "^3.0.3"
   },
-  "homepage": "https://material-dashboard-react-nodejs.creative-tim.com/",
+  "homepage": "/vendor",
   "proxy": "https://node-json-api-free.creative-tim.com/"
 }

@@ -11,7 +11,7 @@ const root = createRoot(rootElement);
 
 root.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename="/vendor">
       <AuthContextProvider>
         <MaterialUIControllerProvider>
           <App />
