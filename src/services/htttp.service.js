@@ -1,7 +1,16 @@
 import Axios from "axios";
-// const API_URL = import.meta.env.VITE_SERVER_URL;
-const API_URL = process.env.REACT_APP_SERVER_URL;
-console.log(API_URL, "fk;fk;skf;lskf;")
+
+// Determine the base URL based on environment
+const getAPIURL = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.REACT_APP_SERVER_URL || 'http://localhost:5000'; // Development
+  }
+  // Production - use the new domain structure
+  return 'https://e-siremart.com/api';
+};
+
+const API_URL = getAPIURL();
+console.log(API_URL, "API URL configured")
 Axios.defaults.baseURL = API_URL;
 export class HttpService {
   _axios = Axios.create();
