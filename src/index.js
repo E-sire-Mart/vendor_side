@@ -5,13 +5,14 @@ import { Provider } from 'react-redux';
 import { AuthContextProvider, MaterialUIControllerProvider } from "context";
 import { store } from './redux/store';
 import App from "App";
+import 'antd/dist/reset.css';
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement);
 
 root.render(
   <Provider store={store}>
-    <BrowserRouter basename="/vendor">
+    <BrowserRouter>
       <AuthContextProvider>
         <MaterialUIControllerProvider>
           <App />

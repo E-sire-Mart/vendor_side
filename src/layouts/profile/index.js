@@ -21,6 +21,7 @@ import Header from "layouts/profile/components/Header";
 
 import { useNavigate } from "react-router-dom";
 import ShopService from '../../services/shop-service.js';
+import { notification } from "antd";
 function Overview() {
 
   const [shops, setShops] = useState([]);
@@ -49,13 +50,30 @@ function Overview() {
   };
 
   const handleDeleteShop = async () => {
-    await ShopService.delete(shops._id);
-    localStorage.removeItem("token");
-   // setIsAuthenticated(false);
-    navigate("/auth/login");
-    // notification.success({
-    //   message: 'Shop Delepted successfully',
-    // });
+    try {
+      await ShopService.delete(shops._id);
+      localStorage.removeItem("token");
+      // setIsAuthenticated(false);
+      
+      // Show success notification
+      notification.success({
+        message: "Shop deleted successfully!",
+        description: "Your shop has been deleted and you have been logged out.",
+        placement: "topRight",
+        duration: 4,
+      });
+      
+      navigate("/auth/login");
+    } catch (error) {
+      // Show error notification if deletion fails
+      notification.error({
+        message: "Shop deletion failed",
+        description: "There was an error deleting your shop. Please try again.",
+        placement: "topRight",
+        duration: 4,
+      });
+      console.error("Shop deletion error:", error);
+    }
   }
 
   return (

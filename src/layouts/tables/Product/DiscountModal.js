@@ -17,10 +17,8 @@ function ProductDiscountModal({ isOpen, onClose, product }) {
         discountPercent,
       };
 
-      console.log(product.props._id, "product._id");
-
       const response = await productService.setDiscountDate(
-        product.props._id,
+        product._id,
         setDiscountData
       );
       console.log(response, "line 21 response");

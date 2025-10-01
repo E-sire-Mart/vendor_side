@@ -37,6 +37,11 @@ class AuthService {
     const updateProfile = "me";
     return await HttpService.patch(updateProfile, newInfo);
   }
+
+  resendVerification = async (payload) => {
+    const resendVerificationEndpoint = '/api/v1/auth/resend-verification';
+    return await HttpService.post(resendVerificationEndpoint, payload);
+  }
 }
 
 export default new AuthService();

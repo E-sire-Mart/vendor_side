@@ -24,6 +24,7 @@ import { AuthContext } from "context";
 import ProtectedRoute from "examples/ProtectedRoute";
 import UserManagement from "layouts/user-management";
 import UserProfile from "layouts/user-profile";
+import Membership from "layouts/membership";
 import { setupAxiosInterceptors } from "./services/interceptor";
 
 export default function App() {
@@ -165,6 +166,16 @@ export default function App() {
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
+              <Route
+                exact
+                path="membership"
+                element={
+                  <ProtectedRoute isAuthenticated={authContext.isAuthenticated}>
+                    <Membership />
+                  </ProtectedRoute>
+                }
+                key="membership"
+              />
               <Route
                 exact
                 path="user-profile"

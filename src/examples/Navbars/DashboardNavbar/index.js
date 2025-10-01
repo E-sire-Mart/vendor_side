@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import { notification } from "antd";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -80,8 +81,28 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
   const handleCloseMenu = () => setOpenMenu(false);
 
   const handleLogOut = async () => {
-    const response = await AuthService.logout();
-    authContext.logout();
+    try {
+      const response = await AuthService.logout();
+      
+      // Show success notification
+      notification.success({
+        message: "Logged out successfully!",
+        description: "You have been logged out of your account.",
+        placement: "topRight",
+        duration: 3,
+      });
+      
+      authContext.logout();
+    } catch (error) {
+      // Show error notification if logout fails
+      notification.error({
+        message: "Logout failed",
+        description: "There was an error logging out. Please try again.",
+        placement: "topRight",
+        duration: 4,
+      });
+      console.error("Logout error:", error);
+    }
   };
 
 

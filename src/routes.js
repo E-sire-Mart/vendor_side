@@ -1,9 +1,13 @@
 import Dashboard from "layouts/dashboard";
 import Tables from "layouts/tables";
 import Notifications from "layouts/notifications";
+import Membership from "layouts/membership";
 import Profile from "layouts/profile";
+
 import OrderTables from "layouts/orders_table"
 import DeliveryTables from "layouts/delivery_table"
+import Comments from "layouts/comments"
+import Chat from "layouts/chat"
 
 import Login from "auth/login";
 import Register from "auth/register";
@@ -46,6 +50,7 @@ const routes = [
     route: "/tables/Deiliverys",
     component: <DeliveryTables />,
   },
+
   {
     type: "collapse",
     name: "Notifications",
@@ -56,11 +61,36 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Membership",
+    key: "membership",
+    icon: <Icon fontSize="small">workspace_premium</Icon>,
+    route: "/membership",
+    component: <Membership />,
+  },
+  {
+    type: "collapse",
     name: "Profile",
     key: "profile",
     icon: <Icon fontSize="small">person</Icon>,
     route: "/profile",
     component: <Profile />,
+  },
+
+  {
+    type: "collapse",
+    name: "Comments",
+    key: "comments",
+    icon: <Icon fontSize="small">comment</Icon>,
+    route: "/comments",
+    component: <Comments />,
+  },
+  {
+    type: "collapse",
+    name: "Chat",
+    key: "chat",
+    icon: <Icon fontSize="small">question_answer</Icon>,
+    route: "/chat",
+    component: <Chat />,
   },
   {
     type: "auth",

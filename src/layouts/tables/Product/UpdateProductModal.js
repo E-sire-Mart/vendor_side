@@ -11,12 +11,14 @@ import ProductForm from '../../../examples/Forms/ProductForm'; // Import or crea
 
 function CreateProductModal({ isOpen, onClose, product }) {
     return (
-        <Dialog open={isOpen} onClose={onClose}>
+        <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="md">
             <DialogTitle>
                 <MDTypography variant="h6">Update your product</MDTypography>
             </DialogTitle>
-            <DialogContent>
+            <DialogContent dividers sx={{ p: 0, maxHeight: '80vh', overflowY: 'auto' }}>
+                <MDBox px={3} py={2}>
                 <ProductForm onClose={onClose} initialProduct={product} />
+                </MDBox>
             </DialogContent>
             <DialogActions>
                 <MDButton onClick={onClose} color="info">

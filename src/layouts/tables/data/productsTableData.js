@@ -1,4 +1,4 @@
-import { notification } from "antd";
+import { notification, Modal } from "antd";
 import MDAvatar from "components/MDAvatar";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -8,6 +8,7 @@ export default function data(searchText) {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProduct1, setSelectedProduct1] = useState(null);
+  const [detailsProduct, setDetailsProduct] = useState(null);
   const API_URL = process.env.REACT_APP_SERVER_URL;
 
     // console.log("----dfdfdfdfd-------", API_URL)
@@ -24,16 +25,16 @@ export default function data(searchText) {
 
 
 
-  const deleteProducts = async (productId) => {
+  const deleteProducts = async (product) => {
     try {
-      await ProductService.delete(productId.props._id);
-      console.log(productId, "productID");
+      await ProductService.delete(product._id);
       notification.success({
-        message: "deleted successfully",
+        message: "Deleted successfully",
       });
       fetchProducts();
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error deleting product:", error);
+      notification.error({ message: "Delete failed" });
     }
   };
 
@@ -60,9 +61,14 @@ export default function data(searchText) {
     fetchProducts();
   };
 
-  const Product = ({ image, name, description, discountPercent, _id }) => (
+  const handleOpenDetails = (product) => setDetailsProduct(product);
+  const handleCloseDetails = () => setDetailsProduct(null);
+
+  const Product = ({ image, name, description, discountPercent, _id, fullProduct }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1} style={{ position: 'relative', paddingLeft: '5px' }}>
-      <MDAvatar src={API_URL + image[0]} name={name} size="lg" />
+      <span onClick={() => handleOpenDetails(fullProduct)} style={{ cursor: 'pointer' }}>
+        <MDAvatar src={API_URL + image[0]} name={name} size="lg" />
+      </span>
       <MDBox ml={2} lineHeight={1}>
         <MDTypography display="block" variant="button" fontWeight="medium">
           {name}
@@ -97,69 +103,9 @@ export default function data(searchText) {
       { Header: "price", accessor: "price", align: "left" },
       { Header: "quantity", accessor: "quantity", align: "center" },
       { Header: "category", accessor: "category", align: "center" },
-      {
-        Header: "action",
-        accessor: "action",
-        align: "center",
-        Cell: ({ row }) => (
-          <MDTypography
-            component="a"
-            href="#"
-            variant="caption"
-            color="text"
-            fontWeight="medium"
-            onClick={() => {
-              deleteProducts();
-              handleOpenUpdateProductModal({
-                quantity: row.original.quantity,
-                category: row.original.category,
-                price: row.original.price,
-                ...row.original.product.props,
-              });
-            }}
-          >
-            Edit
-          </MDTypography>
-        ),
-      },
-      {
-        Header: "discount",
-        accessor: "discount",
-        align: "center",
-        Cell: ({ row }) => (
-          <MDTypography
-            component="a"
-            href="#"
-            variant="caption"
-            color="text"
-            fontWeight="medium"
-            onClick={() => {
-              handleDiscountModal(row.original.product);
-            }}
-          >
-            Discount
-          </MDTypography>
-        ),
-      },
-      {
-        Header: "delete",
-        accessor: "delete",
-        align: "center",
-        Cell: ({ row }) => (
-          <MDTypography
-            component="a"
-            href="#"
-            variant="caption"
-            color="text"
-            fontWeight="medium"
-            onClick={() => {
-              deleteProducts(row.original.product);
-            }}
-          >
-            Delete
-          </MDTypography>
-        ),
-      },
+      { Header: "action", accessor: "action", align: "center" },
+      { Header: "discount", accessor: "discount", align: "center" },
+      { Header: "delete", accessor: "delete", align: "center" },
     ],
 
     rows: products.map((product) => ({
@@ -170,10 +116,11 @@ export default function data(searchText) {
           name={product.name}
           description={product.description}
           _id={product._id}
+          fullProduct={product}
         />
       ),
       price: product.price,
-      category: product.category,
+      category: product.category?.name || product.category || 'No Category',
       quantity: product.quantity,
       action: (
         <MDTypography
@@ -197,7 +144,7 @@ export default function data(searchText) {
           color="text"
           fontWeight="medium"
           onClick={() => {
-            handleCloseDiscountModal(product);
+            handleDiscountModal(product);
           }}
         >
           {product.discountPercent > 0 ?
@@ -218,7 +165,7 @@ export default function data(searchText) {
             </div>
             : null
           }
-          Discont
+          Discount
         </MDTypography>
       ),
       delete: (
@@ -229,7 +176,14 @@ export default function data(searchText) {
           color="text"
           fontWeight="medium"
           onClick={() => {
-            deleteProducts(product);
+            Modal.confirm({
+              title: "Delete product?",
+              content: `Are you sure you want to delete "${product.name}"? This action cannot be undone.`,
+              okText: "Delete",
+              okType: "danger",
+              cancelText: "Cancel",
+              onOk: () => deleteProducts(product),
+            });
           }}
         >
           Delete
@@ -240,5 +194,8 @@ export default function data(searchText) {
     onCloseUpdateProductModal: handleCloseUpdateProductModal,
     selectedProduct1,
     onCloseDisountModal: handleCloseDiscountModal,
+    onOpenDetails: handleOpenDetails,
+    detailsProduct,
+    onCloseDetails: handleCloseDetails,
   };
 }

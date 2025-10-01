@@ -9,7 +9,7 @@ import ProductForm from '../../../examples/Forms/ProductForm';
 
 function CreateProductModal({ isOpen, onClose }) {
     return (
-        <Dialog open={isOpen} onClose={onClose}>
+        <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="md">
             <DialogTitle>
                 <MDTypography variant="h6">Create New Product</MDTypography>
             </DialogTitle>

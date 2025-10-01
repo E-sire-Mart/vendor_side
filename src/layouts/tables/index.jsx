@@ -14,6 +14,7 @@ import productsTableData from "layouts/tables/data/productsTableData";
 import CreateProductModal from "./Product/CreateProductModal";
 import ProductDiscountModal from "./Product/DiscountModal";
 import UpdateProductModal from "./Product/UpdateProductModal";
+import ProductDetailsModal from "./Product/ProductDetailsModal";
 
 function Tables() {
   const searchText = useSelector((state) => state.search.searchText);
@@ -26,6 +27,9 @@ function Tables() {
     selectedProduct1,
     onCloseUpdateProductModal,
     onCloseDisountModal,
+    onOpenDetails,
+    detailsProduct,
+    onCloseDetails,
   } = productsTableData(searchText); // Pass searchText to productsTableData function
 
   const [isCreateProductModalOpen, setCreateProductModalOpen] = useState(false);
@@ -133,6 +137,13 @@ function Tables() {
           product={selectedProduct1}
           onClose={onCloseDisountModal}
           isOpen={selectedProduct1 !== null}
+        />
+      )}
+      {detailsProduct && (
+        <ProductDetailsModal
+          product={detailsProduct}
+          isOpen={!!detailsProduct}
+          onClose={onCloseDetails}
         />
       )}
 

@@ -23,11 +23,15 @@ function MDSelect({ label, value, onChange, options, required }) {
                 <option value="" disabled>
                     Select {label.toLowerCase()}
                 </option>
-                {options.map((option) => (
-                    <option key={option} value={option}>
-                        {option}
-                    </option>
-                ))}
+                {options.map((option) => {
+                    const key = typeof option === 'string' ? option : option.value;
+                    const text = typeof option === 'string' ? option : option.label;
+                    return (
+                        <option key={key} value={key}>
+                            {text}
+                        </option>
+                    );
+                })}
             </select>
         </div>
     );

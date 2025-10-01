@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
@@ -15,11 +15,13 @@ import MDButton from "components/MDButton";
 import BasicLayoutLanding from "layouts/authentication/components/BasicLayoutLanding";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import AuthService from "services/auth-service";
+import ShopService from "services/shop-service";
 import { AuthContext } from "context";
 import axios from "axios";
 
 function Login() {
   const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [inputs, setInputs] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ emailError: false, passwordError: false });
@@ -66,13 +68,75 @@ function Login() {
     try {
       const response = await AuthService.login(myData);
 
+      // Temporarily store token so we can call protected endpoints before final redirect
+      const accessToken = response?.access_token;
+      if (accessToken) {
+        localStorage.setItem("token", accessToken);
+      }
+
+      // Default success toast
       notification.success({
         message: "Sign in successful!",
         description: "You have signed in successfully.",
         placement: "topRight",
       });
 
-      authContext.login(response.access_token, response.refresh_token);
+      // Post-login validations for supplier
+      let shouldRedirectToProfile = false;
+      let postLoginNotice = null;
+      try {
+        const profileRes = await AuthService.getProfile();
+        const isOwner = Boolean(profileRes?.data?.attributes?.is_owner);
+        if (isOwner) {
+          const shopRes = await ShopService.get();
+          const shop = Array.isArray(shopRes?.shop) ? shopRes.shop[0] : undefined;
+
+          if (!shop) {
+            shouldRedirectToProfile = true;
+            postLoginNotice = {
+              message: "Please submit your supplier proposal",
+              description: (
+                <span>
+                  You have not created your shop yet. Go to Profile to submit your proposal for admin approval.
+                </span>
+              ),
+            };
+          } else {
+            const notApproved =
+              shop?.isApproved === false ||
+              shop?.approved === false ||
+              shop?.approval === false ||
+              shop?.status === "PENDING" ||
+              shop?.approvalStatus === "PENDING";
+            if (notApproved) {
+              shouldRedirectToProfile = true;
+              postLoginNotice = {
+                message: "Your proposal is pending approval",
+                description: (
+                  <span>
+                    Your shop is awaiting admin approval. You can review or update your details in Profile.
+                  </span>
+                ),
+              };
+            }
+          }
+        }
+      } catch (ignored) {
+        // If any of the extra checks fail, do not block login; proceed with default navigation.
+      }
+
+      // Finalize login in context (persists token and navigates to dashboard by default)
+      authContext.login(accessToken);
+
+      // If validations require action, redirect to profile and show a notice
+      if (shouldRedirectToProfile && postLoginNotice) {
+        navigate("/profile", { replace: true });
+        notification.info({
+          message: postLoginNotice.message,
+          description: postLoginNotice.description,
+          placement: "topRight",
+        });
+      }
     } catch (res) {
       if (res?.message) {
         setCredentialsError(res.message);
@@ -80,6 +144,32 @@ function Login() {
         setCredentialsError(res.errors[0].detail);
       } else {
         setCredentialsError("An unknown error occurred.");
+      }
+
+      const errorText = res?.message || res?.errors?.[0]?.detail || "";
+      // Prompt unregistered users to register
+      if (/not\s*found|no\s*account|unregister/i.test(errorText)) {
+        notification.warning({
+          message: "No account found",
+          description: (
+            <span>
+              It looks like you don’t have an account yet. <Link to="/auth/register">Register now</Link>.
+            </span>
+          ),
+          placement: "topRight",
+        });
+      }
+      // If backend signals unapproved directly
+      if (/not\s*approved|pending\s*approval/i.test(errorText)) {
+        notification.info({
+          message: "Supplier not approved",
+          description: (
+            <span>
+              Please submit your proposal for admin approval in <Link to="/profile">Profile</Link>.
+            </span>
+          ),
+          placement: "topRight",
+        });
       }
     } finally {
       setLoading(false);
@@ -97,14 +187,31 @@ function Login() {
 
     const sendDataToBackend = async () => {
       try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}api/v1/auth/loginAsAdmin`, {
+        const base = process.env.REACT_APP_API_URL || "/";
+        const url = base.endsWith("/") ? `${base}api/v1/auth/loginAsAdmin` : `${base}/api/v1/auth/loginAsAdmin`;
+        const response = await axios.post(url, {
           token: tokenParam,
           shopId: shopIdParam,
         });
 
-        authContext.login(response.data.access_token, response.data.refresh_token);
+        // Persist token and go straight to dashboard
+        authContext.login(response.data.access_token);
+
+        // Optionally remember the shop context for later requests/screens
+        if (shopIdParam) {
+          localStorage.setItem("impersonatedShopId", shopIdParam);
+        }
+
+        // Clean sensitive params from the URL
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
       } catch (error) {
-        console.error("Error sending data to backend:", error);
+        console.error("Admin SSO login failed:", error?.response?.data || error?.message);
+        // Surface a concise message to the user
+        try {
+          const detail = error?.response?.data?.message || "Invalid or expired admin token";
+          setCredentialsError(detail);
+        } catch (_) {}
       }
     };
 

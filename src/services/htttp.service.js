@@ -1,16 +1,7 @@
 import Axios from "axios";
-
-// Determine the base URL based on environment
-const getAPIURL = () => {
-  if (process.env.NODE_ENV === 'development') {
-    return process.env.REACT_APP_SERVER_URL || 'http://localhost:5000'; // Development
-  }
-  // Production - use the new domain structure
-  return 'https://e-siremart.com/api';
-};
-
-const API_URL = getAPIURL();
-console.log(API_URL, "API URL configured")
+// const API_URL = import.meta.env.VITE_SERVER_URL;
+const API_URL = process.env.REACT_APP_SERVER_URL;
+console.log(API_URL, "fk;fk;skf;lskf;")
 Axios.defaults.baseURL = API_URL;
 export class HttpService {
   _axios = Axios.create();
@@ -34,11 +25,16 @@ export class HttpService {
   delete = async (url) => await this.request(this.getOptionsConfig("delete", url));
 
   getOptionsConfig = (method, url, data) => {
+    // Use multipart headers if FormData is provided
+    const isFormData = typeof FormData !== "undefined" && data instanceof FormData;
+    const headers = isFormData
+      ? { 'Accept': 'application/json' }
+      : { "Content-Type": "application/vnd.api+json", "Accept": "application/vnd.api+json", 'Access-Control-Allow-Credentials': true };
     return {
       method,
       url,
       data,
-      headers: { "Content-Type": "application/vnd.api+json", "Accept": "application/vnd.api+json", 'Access-Control-Allow-Credentials': true },
+      headers,
     };
   };
 
